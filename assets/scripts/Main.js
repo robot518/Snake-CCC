@@ -41,7 +41,7 @@ cc.Class({
         // cc.director.getCollisionManager().enabledDebugDraw = true;
         // var follow = cc.follow(this.snake, cc.rect(-360, -640, 2000,2000));
         // this.node.runAction(follow);
-
+        this.initWXVideo();
         this.initCanvas();
         this.initParas();
         this.initEvent();
@@ -145,6 +145,38 @@ cc.Class({
         if (this._iFood == 0) this.initFood();
     },
 
+    initWXVideo(){
+        if (!window.wx)
+            return;
+        var self = this;
+        this.videoAd = wx.createRewardedVideoAd({
+            adUnitId: 'adunit-46847a228f898c70'
+        });
+        this.videoAd.onClose(res => {
+            if (res && res.isEnded || res === undefined){
+                self.onSurvive();
+            }else{
+
+            }
+        });
+        this.videoAd.onError(err => {
+          console.log(err)
+        });
+    },
+
+    onSurvive(){
+        this._bStart = true;
+        this._bMove = true;
+        this._bPlayTime = true;
+        this.tips.opacity = 0;
+        this.labTime.schedule(this.coPlayTime, 1);
+        this._iDelayTime = 0;
+        this._iSize = 5;
+        this._iSizeB = 5;
+        this.showSize();
+        this.showSizeB();
+    },
+
     initCanvas(){
         var canvas = this.node.getComponent(cc.Canvas);
         var size = canvas.designResolution;
@@ -192,6 +224,12 @@ cc.Class({
     },
 
     initEvent(){
+        cc.find("survive", this.tips).on("click", function (argument) {
+            if (this.tips.opacity < 255) return;
+            if (window.wx){
+                this.videoAd.show();
+            }
+        }, this)
         this.share.on("click", function (argument) {
             if (this.tips.opacity < 255) return;
             if (window.wx){
@@ -235,18 +273,6 @@ cc.Class({
         }, this)
         cc.find("start", down).on("click", function (argument) {
            this.onStart();
-        }, this)
-        cc.find("stop", down).on("click", function (argument) {
-            if (this._bStart == false) return;
-            var str = this._bStop == true ? "Continue" : "Stop";
-            this._bMove = this._bStop;
-            this._bStop = !this._bStop;
-            this.playTips(str);
-            if (this._bPlayTime == true)
-                this.labTime.unschedule(this.coPlayTime);
-            else
-                this.labTime.schedule(this.coPlayTime, 1);
-            this._bPlayTime = !this._bPlayTime;
         }, this)
         var bg = cc.find("bg");
         bg.on("touchstart", function (event) {
@@ -442,6 +468,7 @@ cc.Class({
 
     playSPTips(str){
         this.share.active = true;
+        cc.find("survive", this.tips).active = true;
         var lab = this.tips.children[0];
         lab.getComponent(cc.Label).string = str;
         this.tips.opacity = 255;
@@ -449,6 +476,7 @@ cc.Class({
 
     playTips(str){
         this.share.active = false;
+        cc.find("survive", this.tips).active = false;
         var lab = this.tips.children[0];
         lab.getComponent(cc.Label).string = str;
         this.tips.opacity = 255;
@@ -460,7 +488,7 @@ cc.Class({
         var self = this;
         this.coPlayTime = function(){
             self.labTime.string = self.getStrTime (++self._iTime);
-            if (self._iTime >= 300){
+            if (self._iTime >= 1800){
                 self._bStart = false;
                 self._bMove = false;
                 self._bPlayTime = false;
