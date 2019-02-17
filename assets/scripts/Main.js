@@ -37,6 +37,11 @@ cc.Class({
     },
 
     start () {
+        cc.director.getCollisionManager().enabled = true;
+        // cc.director.getCollisionManager().enabledDebugDraw = true;
+        // var follow = cc.follow(this.snake, cc.rect(-360, -640, 2000,2000));
+        // this.node.runAction(follow);
+
         this.initCanvas();
         this.initParas();
         this.initEvent();
@@ -45,7 +50,99 @@ cc.Class({
     },
 
     update (dt) {
+        if (this._bMove == true){
+            this.snake.y += this.dy*dt;
+            this.snake.x += this.dx*dt;
+            if (this._iDelayTime > 1)
+                this.playSnakeB();
+            else this._iDelayTime+=dt;
+            var iNum = 0;
+            var bStop = false;
+            if (this.snake.y > HEIGHT/2 - 2*DX - this._iSnake){
+                bStop = true;
+                iNum = 1;
+            } else if (this.snake.y < -(HEIGHT/2 - DX - this._iSnake)){
+                bStop = true;
+                iNum = 4;
+            } else if (this.snake.x > WIDTH/2 - this._iSnake){
+                bStop = true;
+                iNum = 3;
+            } else if (this.snake.x < -(WIDTH/2 - this._iSnake)){
+                bStop = true;
+                iNum = 2;
+            }
+            if (bStop == true){
+                this.snake.y -= this.dy*dt;
+                this.snake.x -= this.dx*dt;
+            }
 
+            var children = this.snake.parent.children;
+            var iLen = this._tStep.length;
+            if (iLen > 1){
+                for (var i = 0; i < iLen - 1; i++) {
+                    var item = children[i+1];
+                    var step = this._tStep[i];
+                    item.x = step.x;
+                    item.y = step.y;
+                };
+            }
+            this._tStep.unshift({x:this.snake.x, y:this.snake.y});
+            if (this._tStep.length > this._iSize)
+                this._tStep.splice(-1, 1);
+
+            var childrenB = this.snakeB.parent.children;
+            var iLenB = this._tStepB.length;
+            if (iLenB > 1){
+                for (var i = 0; i < iLenB - 1; i++) {
+                    var item = childrenB[i+1];
+                    var step = this._tStepB[i];
+                    item.x = step.x;
+                    item.y = step.y;
+                };
+            }
+            this._tStepB.unshift({x:this.snakeB.x, y:this.snakeB.y});
+            if (this._tStepB.length > this._iSizeB)
+                this._tStepB.splice(-1, 1);
+            this._iTimeA += dt;
+            this._iTimeB += dt;
+            if (this._iTimeA >= DT_A){
+                this._iSize--;
+                this.showSize();
+                this._iTimeA = 0;
+            }
+            if (this._iTimeB >= DT_B){
+                this._iSizeB--;
+                this.showSizeB();
+                this._iTimeB = 0;
+            }
+            if (this._iSize <= 0 || this._iSizeB <= 0 || (this._iDelayTime > 1 && Math.sqrt(Math.pow(this.snake.x - this.snakeB.x, 2) + Math.pow(this.snake.y - this.snakeB.y, 2)) <= PX)){
+                this._bStart = false;
+                this._bMove = false;
+                this._bPlayTime = false;
+                this.playSPTips("菜鸡! 存活：" + this.labTime.string);
+                this.playSound("lose");
+                this.labTime.unschedule(this.coPlayTime);
+            }
+        }
+    },
+
+    AEatFood(iFood){
+        this._iSize += iFood;
+        if (this._iSize > 5) this._iSize = 5;
+        this.showSize();
+        this.eatFood();
+    },
+
+    BEatFood(iFood){
+        this._iSizeB += iFood;
+        if (this._iSizeB > 5) this._iSizeB = 5;
+        this.showSizeB();
+        this.eatFood();
+    },
+
+    eatFood(){
+        this._iFood--;
+        if (this._iFood == 0) this.initFood();
     },
 
     initCanvas(){
@@ -83,9 +180,11 @@ cc.Class({
         this._bStart = false;
         var children = cc.find("food", this.node).children;
         for (var i = 0; i < children.length; i++) {
-            this._tFood.push(children[i]);
+            var item = children[i];
+            item.getComponent("Food").init(this);
+            this._tFood.push(item);
         };
-        this._iFood = this._tFood[0].width/2;
+        this._iFood = this._tFood.length;
         this.tStr = [];
         this.tStr.push("蛇之大陆爆发了丧尸病毒。。。");
         this.tStr.push("小青感染了丧尸病毒，变成了丧尸。。。");
@@ -131,8 +230,8 @@ cc.Class({
                 this.playTips("小青1秒后病变");
                 this.scheduleOnce(this.onStart, 1);
                 this.bgClip.play();
-            }
-            this.playIntro();
+            }else
+                this.playIntro();
         }, this)
         cc.find("start", down).on("click", function (argument) {
            this.onStart();
@@ -149,7 +248,7 @@ cc.Class({
                 this.labTime.schedule(this.coPlayTime, 1);
             this._bPlayTime = !this._bPlayTime;
         }, this)
-        var bg = cc.find("bg", this.node);
+        var bg = cc.find("bg");
         bg.on("touchstart", function (event) {
             if (this._bTouch == true)
                 return;
@@ -220,7 +319,7 @@ cc.Class({
         this.snakeB.y = 0;
         this._iTimeA = 0;
         this._iTimeB = 0;
-        // this._iIntro = 0;
+        this._iIntro = 0;
         this.dx = 0;
         this.dy = 100;
         this._tStep = [];
@@ -249,7 +348,6 @@ cc.Class({
         this.initFood();
         if (this._bPlayTime == false)
             this.playTime();
-        this.schedule(this.playSnake, DT);
     },
 
     initFood(){
@@ -275,121 +373,6 @@ cc.Class({
             else if (iFood == 2)
                 item.color = new cc.Color(22, 17, 255);
         };
-    },
-
-    playSnake(){
-        if (this._bMove == true){
-            var dt = DT;
-            this.snake.y += this.dy*dt;
-            this.snake.x += this.dx*dt;
-            if (this._iDelayTime > 1)
-                this.playSnakeB();
-            else
-                this._iDelayTime+=DT;
-            var iNum = 0;
-            var bStop = false;
-            if (this.snake.y > HEIGHT/2 - 2*DX - this._iSnake){
-                bStop = true;
-                iNum = 1;
-            } else if (this.snake.y < -(HEIGHT/2 - DX - this._iSnake)){
-                bStop = true;
-                iNum = 4;
-            } else if (this.snake.x > WIDTH/2 - this._iSnake){
-                bStop = true;
-                iNum = 3;
-            } else if (this.snake.x < -(WIDTH/2 - this._iSnake)){
-                bStop = true;
-                iNum = 2;
-            }
-            if (bStop == true){
-                this.snake.y -= this.dy*dt;
-                this.snake.x -= this.dx*dt;
-            }
-
-            var children = this.snake.parent.children;
-            var iLen = this._tStep.length;
-            if (iLen > 1){
-                for (var i = 0; i < iLen - 1; i++) {
-                    var item = children[i+1];
-                    var step = this._tStep[i];
-                    item.x = step.x;
-                    item.y = step.y;
-                };
-            }
-            this._tStep.unshift({x:this.snake.x, y:this.snake.y});
-            if (this._tStep.length > this._iSize)
-                this._tStep.splice(-1, 1);
-
-            var childrenB = this.snakeB.parent.children;
-            var iLenB = this._tStepB.length;
-            if (iLenB > 1){
-                for (var i = 0; i < iLenB - 1; i++) {
-                    var item = childrenB[i+1];
-                    var step = this._tStepB[i];
-                    item.x = step.x;
-                    item.y = step.y;
-                };
-            }
-            this._tStepB.unshift({x:this.snakeB.x, y:this.snakeB.y});
-            if (this._tStepB.length > this._iSizeB)
-                this._tStepB.splice(-1, 1);
-
-            var iDis = this._iSnake + this._iFood;
-            for (var i = 0; i < this._tFood.length; i++) {
-                var item = this._tFood[i];
-                if (item.active == true && Math.abs(item.x - this.snake.x) < iDis && Math.abs(item.y - this.snake.y) < iDis){
-                    item.active = false;
-                    this._iFood--;
-                    var iSizeTemp = parseInt(item.children[0].getComponent(cc.Label).string);
-                    var children = this.snake.parent.children;
-                    var iLen = children.length;
-                    var preItem = children[this._iSize - 1];
-                    this._iSize += iSizeTemp;
-                    if (this._iSize > 5){
-                        iSizeTemp = this._iSize - 5;
-                        this._iSize = 5;
-                    }  
-                    this.showSize();
-                }
-                if (item.active == true && Math.abs(item.x - this.snakeB.x) < iDis && Math.abs(item.y - this.snakeB.y) < iDis){
-                    item.active = false;
-                    this._iFood--;
-                    var iSizeTemp = parseInt(item.children[0].getComponent(cc.Label).string);
-                    var children = this.snakeB.parent.children;
-                    var iLen = children.length;
-                    var preItem = children[this._iSizeB - 1];
-                    this._iSizeB += iSizeTemp;
-                    if (this._iSizeB > 5){
-                        iSizeTemp = this._iSizeB - 5;
-                        this._iSizeB = 5;
-                    } 
-                    this.showSizeB();
-                }
-            };
-            if (this._iFood == 0){
-                this.initFood();
-            }
-            this._iTimeA += dt;
-            this._iTimeB += dt;
-            if (this._iTimeA >= DT_A){
-                this._iSize--;
-                this.showSize();
-                this._iTimeA = 0;
-            }
-            if (this._iTimeB >= DT_B){
-                this._iSizeB--;
-                this.showSizeB();
-                this._iTimeB = 0;
-            }
-            if (this._iSize <= 0 || this._iSizeB <= 0 || (this._iDelayTime > 1 && Math.sqrt(Math.pow(this.snake.x - this.snakeB.x, 2) + Math.pow(this.snake.y - this.snakeB.y, 2)) <= PX)){
-                this._bStart = false;
-                this._bMove = false;
-                this._bPlayTime = false;
-                this.playSPTips("菜鸡! 存活：" + this.labTime.string);
-                this.playSound("lose");
-                this.labTime.unschedule(this.coPlayTime);
-            }
-        }
     },
 
     playSnakeB(){
@@ -508,10 +491,7 @@ cc.Class({
     },
 
     playIntro(){
-        var self = this;
-        var str = self.tStr[this._iIntro];
-        self.labIntro.string = str;
-        this._iIntro++;
+        this.labIntro.string = this.tStr[this._iIntro++];
         this.sp1.active = false;
         this.sp2.active = false;
         this.sp3.active = false;
@@ -527,4 +507,9 @@ cc.Class({
         var str = cc.url.raw("resources/audio/" + sName + ".mp3");
         cc.audioEngine.play(str, false, 1);
     },
+
+    onDisable(){
+        cc.director.getCollisionManager().enabled = false;
+        cc.director.getCollisionManager().enabledDebugDraw = false;
+    }
 });
