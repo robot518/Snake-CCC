@@ -13,6 +13,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        goSurvive: cc.Node,
         snakeB: cc.Node,
         snake: cc.Node,
         food: cc.Node,
@@ -119,7 +120,9 @@ cc.Class({
                 this._bStart = false;
                 this._bMove = false;
                 this._bPlayTime = false;
-                this.playSPTips("菜鸡! 存活：" + this.labTime.string);
+                if (this._iLife == 1)
+                    this.goSurvive.active = true;
+                else this.playSPTips("菜鸡! 存活：" + this.labTime.string);
                 this.playSound("lose");
                 this.labTime.unschedule(this.coPlayTime);
             }
@@ -175,6 +178,8 @@ cc.Class({
         this._iSizeB = 5;
         this.showSize();
         this.showSizeB();
+        this.goSurvive.active = false;
+        this._iLife = 0;
     },
 
     initCanvas(){
@@ -192,6 +197,7 @@ cc.Class({
     },
 
     initParas(){
+        this._iLife = 1;
         this._iFood = 0;
         this._tStep = [];
         this._tStepB = [];
@@ -224,8 +230,7 @@ cc.Class({
     },
 
     initEvent(){
-        cc.find("survive", this.tips).on("click", function (argument) {
-            if (this.tips.opacity < 255) return;
+        cc.find("survive", this.goSurvive).on("click", function (argument) {
             if (window.wx){
                 this.videoAd.show();
             }
@@ -234,7 +239,7 @@ cc.Class({
             if (this.tips.opacity < 255) return;
             if (window.wx){
                 wx.shareAppMessage({
-                    title: "你咋不上天！",
+                    title: "可敢一战！",
                     imageUrl: canvas.toTempFilePathSync({
                         destWidth: 500,
                         destHeight: 400
@@ -250,10 +255,10 @@ cc.Class({
                     extraData: {
                         foo: 'Snake'
                     },
-                    envVersion: 'develop',
-                        success(res) {
+                    envVersion: 'release',
+                    success(res) {
                         // 打开成功
-                    console.log("success: ", res);
+                        console.log("success: ", res);
                     },
                     fail(res){
                         console.log("fail: ", res);
@@ -336,6 +341,7 @@ cc.Class({
     },
 
     onStart(){
+        this._iLife = 1;
         this.tips.opacity = 0;
         this._bStart = true;
         this._bStop = false;
@@ -468,7 +474,6 @@ cc.Class({
 
     playSPTips(str){
         this.share.active = true;
-        cc.find("survive", this.tips).active = true;
         var lab = this.tips.children[0];
         lab.getComponent(cc.Label).string = str;
         this.tips.opacity = 255;
@@ -476,7 +481,6 @@ cc.Class({
 
     playTips(str){
         this.share.active = false;
-        cc.find("survive", this.tips).active = false;
         var lab = this.tips.children[0];
         lab.getComponent(cc.Label).string = str;
         this.tips.opacity = 255;
