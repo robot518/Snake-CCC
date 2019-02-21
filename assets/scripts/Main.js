@@ -13,6 +13,7 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        mine: cc.Node,
         goSurvive: cc.Node,
         snakeB: cc.Node,
         snake: cc.Node,
@@ -51,6 +52,19 @@ cc.Class({
     },
 
     update (dt) {
+        var mine = this.tMine[this.iPlayMineIdx];
+        mine.scaleX+=0.01;
+        mine.scaleY+=0.01;
+        if (mine.scaleX > 2){
+            mine.scaleX = mine.scaleY = 1;
+            this.iPlayMineIdx++;
+            if (this.iPlayMineIdx >= this.tMine.length){
+                this.iPlayMineIdx = 0;
+                for (var i = 1; i < this.tMine.length; i++)
+                    this.tMine[i].active = false;
+            }
+            this.tMine[this.iPlayMineIdx].active = true;
+        }
         if (this._bMove == true){
             this.snake.y += this.dy*dt;
             this.snake.x += this.dx*dt;
@@ -120,9 +134,35 @@ cc.Class({
                 this._bStart = false;
                 this._bMove = false;
                 this._bPlayTime = false;
-                if (this._iLife == 1)
+                if (this._iLife == 1){
                     this.goSurvive.active = true;
-                else this.playSPTips("菜鸡! 存活：" + this.labTime.string);
+                    if (window.wx){
+                        if (this.bannerAd != null)
+                            this.bannerAd.destory();
+                        var systemInfo = wx.getSystemInfoSync();
+                        this.bannerAd = wx.createBannerAd({
+                            adUnitId: 'adunit-20bf80e15edfcc8d',
+                            style: {
+                                left: 0,
+                                top: systemInfo.windowHeight - 144,
+                                width: 720,
+                            }
+                        });
+                        var self = this;
+                        this.bannerAd.onResize(res => {
+                            if (self.bannerAd)
+                                self.bannerAd.style.top = systemInfo.windowHeight - self.bannerAd.style.realHeight
+                        })
+                        this.bannerAd.show();
+                        this.bannerAd.onError(err => {
+                          console.log(err);
+                          //无合适广告
+                          if (err.errCode == 1004){
+
+                          }
+                        })
+                    }
+                }else this.playSPTips("菜鸡! 存活：" + this.labTime.string);
                 this.playSound("lose");
                 this.labTime.unschedule(this.coPlayTime);
             }
@@ -165,6 +205,7 @@ cc.Class({
         this.videoAd.onError(err => {
           console.log(err)
         });
+
     },
 
     onSurvive(){
@@ -180,6 +221,8 @@ cc.Class({
         this.showSizeB();
         this.goSurvive.active = false;
         this._iLife = 0;
+        if (this.bannerAd != null)
+            this.bannerAd.hide();
     },
 
     initCanvas(){
@@ -197,6 +240,8 @@ cc.Class({
     },
 
     initParas(){
+        this.tMine = this.mine.parent.children;
+        this.iPlayMineIdx = 0;
         this._iLife = 1;
         this._iFood = 0;
         this._tStep = [];
@@ -230,6 +275,11 @@ cc.Class({
     },
 
     initEvent(){
+        cc.find("restart", this.goSurvive).on("click", function (argument) {
+            this.goSurvive.active = false;
+            if (this.bannerAd != null)
+                this.bannerAd.hide();
+        }, this)
         cc.find("survive", this.goSurvive).on("click", function (argument) {
             if (window.wx){
                 this.videoAd.show();
@@ -247,7 +297,7 @@ cc.Class({
                 });
             }
         }, this)
-        cc.find("top/mine", this.node).on("click", function (argument) {
+        this.mine.on("click", function (argument) {
            if (window.wx){
                 wx.navigateToMiniProgram({
                     appId: 'wx4e23a5ec42c5a796',
