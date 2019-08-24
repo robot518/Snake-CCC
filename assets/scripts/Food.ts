@@ -1,19 +1,21 @@
-cc.Class({
-    extends: cc.Component,
+const {ccclass, property} = cc._decorator;
 
-    properties: {
-        lab: cc.Label,
-    },
+@ccclass
+export default class NewClass extends cc.Component {
+
+    @property(cc.Label)
+    lab: cc.Label = null;
+    _delt: any;
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    // onLoad () {}
 
     start () {
 
-    },
+    }
 
-    // update (dt) {},
+    // update (dt) {}
 
     onCollisionEnter(other, self) {
         var name = other.name;
@@ -25,9 +27,9 @@ cc.Class({
             this.node.active = false;
             this._delt.BEatFood(parseInt(this.lab.string));
         }
-    },
+    }
 
     init(delt) {
         this._delt = delt;
-    },
-});
+    }
+}
