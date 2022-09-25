@@ -25,7 +25,8 @@ export default class SnakendBall extends cc.Component {
     @property(cc.Node)
     ndBall: cc.Node = null;
 
-    _speed : number = -100000;
+    _speed : number = -10000;
+    _iScale : number = 1;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -75,6 +76,13 @@ export default class SnakendBall extends cc.Component {
             this._isSleep = true;
             this.onSleep();
         }
+        // if (this._iScale == 1 && this.ndSnake.y > 720){
+        //     this.ndBg.scale = 0.1;
+        //     // this.ndBg.scaleY = 0.1;
+        //     this._iScale = 2;
+        //     this.ndSnake.scale = 10;
+        //     this.ndSnake.setPosition(cc.v2(0,0));
+        // }
     }
 
     initCanvas(){
@@ -182,14 +190,14 @@ export default class SnakendBall extends cc.Component {
         }, this)
     }
 
-    onShooting(li) {
+    onShooting(p) {
 		if (this._isStop == false) return;
 		this._isStop = false;
         this._isStart = true;
 		// let collider = this.ndSnake.getComponent(cc.PhysicsCircleCollider);
 		// collider.sensor = false;
 		// collider.apply();
-        this.ndSnake.getComponent(cc.RigidBody).applyForceToCenter(cc.v2(li.x*this._speed, li.y*this._speed),true);
+        this.ndSnake.getComponent(cc.RigidBody).applyForceToCenter(cc.v2(p.x*this._speed, p.y*this._speed),true);
 	}
     
     initFood(){
