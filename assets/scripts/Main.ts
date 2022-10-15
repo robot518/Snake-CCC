@@ -128,73 +128,73 @@ export default class Main extends cc.Component {
 
     update (dt) {
         if (this._bMove == true){
-            let mx = this.dx*dt,
-                my = this.dy*dt;
-            this.snake.x += mx;
-            this.snake.y += my;
-            this.ndBg.x -= mx;
-            this.ndBg.y -= my;
-            if (this._iDelayTime > 1){
-                this.playSnakeB();
-            }else this._iDelayTime+=dt;
-            if (this.snake.y > HEIGHT/2 - this._iSnake || this.snake.y < -(HEIGHT/2 - this._iSnake) 
-                || this.snake.x > WIDTH/2 - this._iSnake || this.snake.x < -(WIDTH/2 - this._iSnake)){
-                this.snake.x -= mx;
-                this.snake.y -= my;
-                this.ndBg.x += mx;
-                this.ndBg.y += my;
-            }
+            // let mx = this.dx*dt,
+            //     my = this.dy*dt;
+            // this.snake.x += mx;
+            // this.snake.y += my;
+            // this.ndBg.x -= mx;
+            // this.ndBg.y -= my;
+            // if (this._iDelayTime > 1){
+            //     // this.playSnakeB();
+            // }else this._iDelayTime+=dt;
+            // if (this.snake.y > HEIGHT/2 - this._iSnake || this.snake.y < -(HEIGHT/2 - this._iSnake) 
+            //     || this.snake.x > WIDTH/2 - this._iSnake || this.snake.x < -(WIDTH/2 - this._iSnake)){
+            //     this.snake.x -= mx;
+            //     this.snake.y -= my;
+            //     this.ndBg.x += mx;
+            //     this.ndBg.y += my;
+            // }
 
-            var children = this.snake.parent.children;
-            var iLen = this._tStep.length;
-            if (iLen > 1){
-                for (var i = 0; i < iLen - 1; i++) {
-                    var item = children[i+1];
-                    var step = this._tStep[i];
-                    item.x = step.x;
-                    item.y = step.y;
-                };
-            }
-            this._tStep.unshift({x:this.snake.x, y:this.snake.y});
-            if (this._tStep.length > this._iSize)
-                this._tStep.splice(-1, 1);
+            // var children = this.snake.parent.children;
+            // var iLen = this._tStep.length;
+            // if (iLen > 1){
+            //     for (var i = 0; i < iLen - 1; i++) {
+            //         var item = children[i+1];
+            //         var step = this._tStep[i];
+            //         item.x = step.x;
+            //         item.y = step.y;
+            //     };
+            // }
+            // this._tStep.unshift({x:this.snake.x, y:this.snake.y});
+            // if (this._tStep.length > this._iSize)
+            //     this._tStep.splice(-1, 1);
 
-            var childrenB = this.snakeB.parent.children;
-            var iLenB = this._tStepB.length;
-            if (iLenB > 1){
-                for (var i = 0; i < iLenB - 1; i++) {
-                    var item = childrenB[i+1];
-                    var step = this._tStepB[i];
-                    item.x = step.x;
-                    item.y = step.y;
-                };
-            }
-            this._tStepB.unshift({x:this.snakeB.x, y:this.snakeB.y});
-            if (this._tStepB.length > this._iSizeB)
-                this._tStepB.splice(-1, 1);
-            this._iTimeA += dt;
-            this._iTimeB += dt;
-            if (this._iTimeA >= DT_A){
-                this._iSize--;
-                this.showSize();
-                this._iTimeA = 0;
-            }
-            if (this._iTimeB >= DT_B){
-                this._iSizeB--;
-                this.showSizeB();
-                this._iTimeB = 0;
-            }
-            if (this._iSize <= 0 || this._iSizeB <= 0 || (this._iDelayTime > 1 && Math.sqrt(Math.pow(this.snake.x - this.snakeB.x, 2) + Math.pow(this.snake.y - this.snakeB.y, 2)) <= PX)){
-                this._bStart = false;
-                this._bMove = false;
-                this._bPlayTime = false;
-                if (this._iLife == 1){
-                    this.goSurvive.active = true;
-                    if (this.bannerAd != null) this.bannerAd.show();
-                }else this.playSPTips("菜鸡! 存活：" + this.labTime.string);
-                this.playSound("lose");
-                this.labTime.unschedule(this.coPlayTime);
-            }
+            // var childrenB = this.snakeB.parent.children;
+            // var iLenB = this._tStepB.length;
+            // if (iLenB > 1){
+            //     for (var i = 0; i < iLenB - 1; i++) {
+            //         var item = childrenB[i+1];
+            //         var step = this._tStepB[i];
+            //         item.x = step.x;
+            //         item.y = step.y;
+            //     };
+            // }
+            // this._tStepB.unshift({x:this.snakeB.x, y:this.snakeB.y});
+            // if (this._tStepB.length > this._iSizeB)
+            //     this._tStepB.splice(-1, 1);
+            // this._iTimeA += dt;
+            // this._iTimeB += dt;
+            // if (this._iTimeA >= DT_A){
+            //     this._iSize--;
+            //     this.showSize();
+            //     this._iTimeA = 0;
+            // }
+            // if (this._iTimeB >= DT_B){
+            //     this._iSizeB--;
+            //     this.showSizeB();
+            //     this._iTimeB = 0;
+            // }
+            // if (this._iSize <= 0 || this._iSizeB <= 0 || (this._iDelayTime > 1 && Math.sqrt(Math.pow(this.snake.x - this.snakeB.x, 2) + Math.pow(this.snake.y - this.snakeB.y, 2)) <= PX)){
+            //     this._bStart = false;
+            //     this._bMove = false;
+            //     this._bPlayTime = false;
+            //     if (this._iLife == 1){
+            //         this.goSurvive.active = true;
+            //         if (this.bannerAd != null) this.bannerAd.show();
+            //     }else this.playSPTips("菜鸡! 存活：" + this.labTime.string);
+            //     this.playSound("lose");
+            //     this.labTime.unschedule(this.coPlayTime);
+            // }
         }
     }
 
@@ -312,47 +312,59 @@ export default class Main extends cc.Component {
             if (this._bTouch == true)
                 return;
             this._bTouch = true;
-            this.preX = this.ball.x;
-            this.preY = this.ball.y;
+            // this.preX = this.ball.x;
+            // this.preY = this.ball.y;
+            // let pos = this.node.convertToNodeSpaceAR(event.getLocation());
+            // this.ball.setPosition(pos);
         }, this)
         bg.on("touchmove", function (event) {
-            var touch = event.touch;
-            var vPre = touch._startPoint;
-            var vCur = touch._point;
-            var mX = vCur.x - vPre.x;
-            var mY = vCur.y - vPre.y;
-            this.ball.x = this.preX + mX;
-            this.ball.y = this.preY + mY;
-            this.dx = mX > 0 ? IMOVE : -IMOVE;
-            this.dy = mY > 0 ? IMOVE : -IMOVE;
-            if (mX == 0) 
-                this.dx = 0;
-            if (mY == 0)
-                this.dy = 0;
-            var iR2 = PX*PX;
-            if (Math.pow(this.ball.x - this.preX, 2) + Math.pow(this.ball.y - this.preY, 2) > iR2){
-                if (mX != 0){
-                    var k = mY/mX;
-                    this.ball.x = mX/Math.abs(mX)*Math.sqrt(iR2/(1+k*k));
-                    this.ball.y = k*this.ball.x;
-                }else{
-                    this.ball.x = 0;
-                    this.ball.y = mY/Math.abs(mY)*PX;
-                }
-            }
+            // let posDelta = event.getDelta();
+            // this.ball.setPosition(this.ball.position.add(posDelta));
+            // var touch = event.touch;
+            // var vPre = touch._startPoint;
+            // var vCur = touch._point;
+            // var mX = vCur.x - vPre.x;
+            // var mY = vCur.y - vPre.y;
+            // // let posDelta = event.getDelta();
+            // // mX=posDelta.x,mY=posDelta.y;
+            // this.ball.x = this.preX + mX;
+            // this.ball.y = this.preY + mY;
+            // this.dx = mX > 0 ? IMOVE : -IMOVE;
+            // this.dy = mY > 0 ? IMOVE : -IMOVE;
+            // if (mX == 0) 
+            //     this.dx = 0;
+            // if (mY == 0)
+            //     this.dy = 0;
+            // var iR2 = PX*PX;
+            // let curLen = this.ball.getPosition().mag();
+            // if(curLen>PX){
+            //     this.ball.setPosition(this.ball.position.div(curLen/PX));
+            // }
+            // if (Math.pow(this.ball.x - this.preX, 2) + Math.pow(this.ball.y - this.preY, 2) > iR2){
+            //     if (mX != 0){
+            //         var k = mY/mX;
+            //         this.ball.x = mX/Math.abs(mX)*Math.sqrt(iR2/(1+k*k));
+            //         this.ball.y = k*this.ball.x;
+            //     }else{
+            //         this.ball.x = 0;
+            //         this.ball.y = mY/Math.abs(mY)*PX;
+            //     }
+            // }
             var iTemp = (2*IMOVE)/PX;
-            this.dx += (this.ball.x - this.preX)*iTemp;
-            this.dy += (this.ball.y - this.preY)*iTemp;
+            // this.dx += (this.ball.x - this.preX)*iTemp;
+            // this.dy += (this.ball.y - this.preY)*iTemp;
         }, this)
         bg.on("touchend", function (argument) {
             this._bTouch = false;
-            this.ball.x = this.preX;
-            this.ball.y = this.preY;
+            // this.ball.x = this.preX;
+            // this.ball.y = this.preY;
+            this.ball.setPosition(cc.v2(0,0));
         }, this)
         bg.on("touchcancel", function (argument) {
             this._bTouch = false;
-            this.ball.x = this.preX;
-            this.ball.y = this.preY;
+            // this.ball.x = this.preX;
+            // this.ball.y = this.preY;
+            this.ball.setPosition(cc.v2(0,0));
         }, this)
 
         if (CC_WECHATGAME){
