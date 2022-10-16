@@ -6,8 +6,7 @@ export default class NewClass extends cc.Component {
     @property(cc.Node)
     player: cc.Node = null;
 
-    @property
-    maxSpeed: number = 10;
+    maxSpeed: number = 5;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -49,8 +48,8 @@ export default class NewClass extends cc.Component {
             ratio = 1;
         }
 
-        let dis = this.dir.mul(this.maxSpeed * ratio);
-        this.player.setPosition(this.player.position.add(dis));
+        // let dis = this.dir.mul(this.maxSpeed * ratio);
+        // this.player.setPosition(this.player.position.add(dis));
     },
 
     onTouchStart(event) {
@@ -64,6 +63,7 @@ export default class NewClass extends cc.Component {
         let posDelta = event.getDelta();
         this.joyStickBtn.setPosition(this.joyStickBtn.position.add(posDelta));
         this.dir = this.joyStickBtn.position.normalize();
+        this.player.getComponent('Head').dir = this.dir;
     },
      
     onTouchEnd(event) {
