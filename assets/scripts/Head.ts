@@ -29,7 +29,7 @@ export default class NewClass extends cc.Component {
             this.getNewBody();
 
         this.dir = null;
-        this.speed = this.sectionLen / this.time;
+        // this.speed = this.sectionLen / this.time;
         this.pointsArray = [];
         this.headPointsNum = 0;
     }
@@ -80,16 +80,16 @@ export default class NewClass extends cc.Component {
     
         // new body's color should be same as that of head
         newBody.color = this.node.color;
-        if (this.snakeArray.length > this.bodyNum)
-            newBody.curIndex = this.snakeArray[this.snakeArray.length-1].curIndex;
-        else
-            newBody.curIndex = 0;
+        // if (this.snakeArray.length >= this.bodyNum)
+        //     newBody.curIndex = this.snakeArray[this.snakeArray.length-1].curIndex;
+        // else
+        //     newBody.curIndex = 0;
     
         // add to canvas and snakeArray
         this.node.parent.addChild(newBody);
         this.snakeArray.push(newBody);
 
-        this.recordPoints();
+        // this.recordPoints();
     }
 
     rotateHead (headPos) {
@@ -102,16 +102,23 @@ export default class NewClass extends cc.Component {
     moveSnake() {
         // move snake
         let dis = this.dir.mul(this.speed);
+        let pos1 = this.node.position;
         this.node.setPosition(this.node.position.add(dis));
-        this.pointsArray.push(this.node.position);
+        // this.pointsArray.push(this.node.position);
 
-        this.headPointsNum += 1;
+        // this.headPointsNum += 1;
 
-        for(let i=1; i<this.snakeArray.length; i++) {
-            let num = Math.floor((this.pointsArray.length-this.headPointsNum) / (this.snakeArray.length-1) * (this.snakeArray.length-1-i));
-            this.snakeArray[i].setPosition(this.pointsArray[num+this.snakeArray[i].curIndex]);
-            this.snakeArray[i].curIndex += 1;
+        for (let i = 1; i < this.snakeArray.length; i++) {
+            let pos2 = this.snakeArray[i].position;
+            this.snakeArray[i].setPosition(pos1);
+            pos1 = pos2;
         }
+
+        // for(let i=1; i<this.snakeArray.length; i++) {
+        //     let num = Math.floor((this.pointsArray.length-this.headPointsNum) / (this.snakeArray.length-1) * (this.snakeArray.length-1-i));
+        //     this.snakeArray[i].setPosition(this.pointsArray[num+this.snakeArray[i].curIndex]);
+        //     this.snakeArray[i].curIndex += 1;
+        // }
     },
 
     recordPoints () {
