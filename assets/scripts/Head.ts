@@ -10,10 +10,9 @@ export default class NewClass extends cc.Component {
     sectionLen: number = 25;
     dir: any = null;
 
-    time: number = 5;
-    speed: number = 5;
-    pointsArray: any = [];
+    speed: number = 1;
     snakeArray: any = [];
+    pointsArray: any = [];
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -29,9 +28,9 @@ export default class NewClass extends cc.Component {
             this.getNewBody();
 
         this.dir = null;
-        // this.speed = this.sectionLen / this.time;
         this.pointsArray = [];
-        this.headPointsNum = 0;
+
+        this.iTime = 0;
     }
 
     start () {
@@ -41,7 +40,7 @@ export default class NewClass extends cc.Component {
     update (dt) {
         if (this.dir) {
             this.rotateHead(this.dir);
-            this.moveSnake();
+            this.moveSnake(dt);
         }
     }
 
@@ -55,8 +54,8 @@ export default class NewClass extends cc.Component {
 
     randomPos () {
         // get random position
-        let width = this.node.parent.width;
-        let height = this.node.parent.height;
+        let width = this.node.parent.parent.width;
+        let height = this.node.parent.parent.height;
         let x = Math.round(Math.random()*width) - width/2;
         let y = Math.round(Math.random()*height) - height/2;
         return cc.v2(x, y);
@@ -77,19 +76,11 @@ export default class NewClass extends cc.Component {
             let dir = lastBOBody.position.sub(lastBody.position).normalize();
             newBody.setPosition(lastBody.position.sub(dir.mul(this.sectionLen)));
         }
-    
-        // new body's color should be same as that of head
         newBody.color = this.node.color;
-        // if (this.snakeArray.length >= this.bodyNum)
-        //     newBody.curIndex = this.snakeArray[this.snakeArray.length-1].curIndex;
-        // else
-        //     newBody.curIndex = 0;
     
         // add to canvas and snakeArray
         this.node.parent.addChild(newBody);
         this.snakeArray.push(newBody);
-
-        // this.recordPoints();
     }
 
     rotateHead (headPos) {
@@ -99,43 +90,26 @@ export default class NewClass extends cc.Component {
         // console.log("angle = ", angle,headPos);
     },
 
-    moveSnake() {
+    moveSnake(dt) {
         // move snake
         let dis = this.dir.mul(this.speed);
-        let pos1 = this.node.position;
         this.node.setPosition(this.node.position.add(dis));
-        // this.pointsArray.push(this.node.position);
+        this.pointsArray.push(this.node.position);
 
-        // this.headPointsNum += 1;
-
+        let step = this.sectionLen/this.speed;
         for (let i = 1; i < this.snakeArray.length; i++) {
-            let pos2 = this.snakeArray[i].position;
-            this.snakeArray[i].setPosition(pos1);
-            pos1 = pos2;
+            if (this.pointsArray.length <= step*i) {
+                let lastBody = this.snakeArray[this.snakeArray.length-1];
+                let lastBOBody = this.snakeArray[this.snakeArray.length-2];
+                let dir = lastBOBody.position.sub(lastBody.position).normalize();
+                dis = dir.mul(this.speed);
+                this.snakeArray[i].setPosition(this.snakeArray[i].position.add(dis));
+            }else{
+                this.snakeArray[i].setPosition(this.pointsArray[this.pointsArray.length-step*i]);
+            }
         }
-
-        // for(let i=1; i<this.snakeArray.length; i++) {
-        //     let num = Math.floor((this.pointsArray.length-this.headPointsNum) / (this.snakeArray.length-1) * (this.snakeArray.length-1-i));
-        //     this.snakeArray[i].setPosition(this.pointsArray[num+this.snakeArray[i].curIndex]);
-        //     this.snakeArray[i].curIndex += 1;
-        // }
-    },
-
-    recordPoints () {
-        // record points between bodies (head is a special body)
-        let len = 0;
-        let index = 0;
-    
-        while(len < this.sectionLen) {
-            len += this.speed;
-    
-            let lastBody = this.snakeArray[this.snakeArray.length-1];
-            let lastBOBody = this.snakeArray[this.snakeArray.length-2];
-            let dir = lastBOBody.position.sub(lastBody.position).normalize();
-    
-            let pos = lastBody.position.add(dir.mul(len));
-            this.pointsArray.splice(index, 0, pos);
-            index += 1;
-        };
+        if (this.pointsArray.length > step*(this.snakeArray.length-1)) {
+            this.pointsArray.splice(0,1);
+        }
     },
 }

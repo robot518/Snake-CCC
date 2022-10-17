@@ -18,17 +18,13 @@ export default class NewClass extends cc.Component {
     // update (dt) {}
 
     onCollisionEnter(other, self) {
-        var name = other.name;
-        // console.log(other);
-        name = name.substring(0, name.indexOf("<"));
-        if (name == "A"){
+        var name = other.node.name;
+        // name = name.substring(0, name.indexOf("<"));
+        if (name == "head"){
             this.node.active = false;
-            this._delt.AEatFood(parseInt(this.lab.string));
+            this._delt.AEatFood(1);
+            other.node.getComponent("Head").getNewBody();
         }
-        // else if(name == "B"){
-        //     this.node.active = false;
-        //     this._delt.BEatFood(parseInt(this.lab.string));
-        // }
     }
 
     init(delt) {

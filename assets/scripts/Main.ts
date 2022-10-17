@@ -1,5 +1,7 @@
-const HEIGHT = 2560;
-const WIDTH = 1440;
+// const HEIGHT = 2560;
+// const WIDTH = 1440;
+const HEIGHT = 1000;
+const WIDTH = 720;
 const PX = 60;
 const DT = 0.02;
 const DT_A = 3;
