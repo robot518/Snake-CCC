@@ -358,8 +358,8 @@ export default class Main extends cc.Component {
     }
 
     initFood(){
-        var iPx = -(WIDTH/2 - this._tFood[0].width/2);
-        var iPy = -(HEIGHT/2 - this._tFood[0].width/2);
+        var iPx = -(WIDTH/2 - this._tFood[0].width/2-0.5*DX);
+        var iPy = -(HEIGHT/2 - this._tFood[0].width/2 - 2.5*DX);
         var iLX = -2*iPx;
         var iLY = -2*iPy;
         this._iFood = this._tFood.length;
