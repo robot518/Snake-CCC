@@ -71,11 +71,11 @@ export default class SnakendBall extends cc.Component {
             if (this._tStep.length > this._iSize)
                 this._tStep.splice(-1, 1);
         }
-        if (this._isStart && !this.ndSnake.getComponent(cc.RigidBody).awake && !this._isSleep) {
-            //白球从运动到停止，状态切换时，标记设置为true，并发送白球停止的事件
-            this._isSleep = true;
-            this.onSleep();
-        }
+        // if (this._isStart && !this.ndSnake.getComponent(cc.RigidBody).awake && !this._isSleep) {
+        //     //白球从运动到停止，状态切换时，标记设置为true，并发送白球停止的事件
+        //     this._isSleep = true;
+        //     this.onSleep();
+        // }
         // if (this._iScale == 1 && this.ndSnake.y > 720){
         //     this.ndBg.scale = 0.1;
         //     // this.ndBg.scaleY = 0.1;
@@ -254,15 +254,15 @@ export default class SnakendBall extends cc.Component {
         this.ndSnake.parent.addChild(ball);
     }
 
-    onSleep(){
-        this._isStop = true;
-        this.ndBall.parent.active = true;
-        this._isMovable = true;
-        let children = this.ndSnake.parent.children;
-        for (let i = 1; i < children.length; i++) {
-            const item = children[i];
-            item.active = true;
-            item.setPosition(cc.v2(this.ndSnake.x,this.ndSnake.y));
-        }
-    }
+    // onSleep(){
+    //     this._isStop = true;
+    //     this.ndBall.parent.active = true;
+    //     this._isMovable = true;
+    //     let children = this.ndSnake.parent.children;
+    //     for (let i = 1; i < children.length; i++) {
+    //         const item = children[i];
+    //         item.active = true;
+    //         item.setPosition(cc.v2(this.ndSnake.x,this.ndSnake.y));
+    //     }
+    // }
 }

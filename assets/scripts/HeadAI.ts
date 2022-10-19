@@ -1,7 +1,7 @@
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class Head extends cc.Component {
+export default class HeadAI extends cc.Component {
 
     @property(cc.Prefab)
     bodyPrefab: cc.Prefab = null;
@@ -10,7 +10,7 @@ export default class Head extends cc.Component {
     sectionLen: number = 24;
     dir: any = null;
 
-    speed: number = 3;
+    speed: number = 2;
     snakeArray: any = [];
     pointsArray: any = [];
 
@@ -58,7 +58,7 @@ export default class Head extends cc.Component {
         let green = Math.round(Math.random()*255);
         let blue = Math.round(Math.random()*255);
         // return new cc.Color(red, green, blue);
-        return new cc.Color(188,188,188);
+        return new cc.Color(66,66,66);
     },
 
     randomPos () {
@@ -68,7 +68,7 @@ export default class Head extends cc.Component {
         let x = Math.round(Math.random()*width) - width/2;
         let y = Math.round(Math.random()*height) - height/2;
         // return cc.v2(x, y);
-        return cc.v2(-0.5,0.5);
+        return cc.v2(100.5,100.5);
     },
 
     getNewBody () {

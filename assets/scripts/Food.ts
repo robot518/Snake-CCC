@@ -1,7 +1,7 @@
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class Food extends cc.Component {
 
     @property(cc.Label)
     lab: cc.Label = null;
@@ -24,6 +24,10 @@ export default class NewClass extends cc.Component {
             this.node.active = false;
             this._delt.AEatFood(1);
             other.node.getComponent("Head").getNewBody();
+        }else if (name == "headAI"){
+            this.node.active = false;
+            this._delt.BEatFood(2);
+            other.node.getComponent("HeadAI").getNewBody();
         }
     }
 

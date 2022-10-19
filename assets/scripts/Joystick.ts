@@ -1,12 +1,13 @@
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class NewClass extends cc.Component {
+export default class Joystick extends cc.Component {
 
     @property(cc.Node)
     player: cc.Node = null;
 
     maxSpeed: number = 5;
+    canMove: boolean = false;
 
     // LIFE-CYCLE CALLBACKS:
 
@@ -53,12 +54,14 @@ export default class NewClass extends cc.Component {
     },
 
     onTouchStart(event) {
+        if (!this.canMove) return;
         // when touch starts, set joyStickBtn's position 
         let pos = this.node.convertToNodeSpaceAR(event.getLocation());
         this.joyStickBtn.setPosition(pos);
     },
      
     onTouchMove(event) {
+        if (!this.canMove) return;
         // constantly change joyStickBtn's position
         let posDelta = event.getDelta();
         this.joyStickBtn.setPosition(this.joyStickBtn.position.add(posDelta));
