@@ -15,7 +15,6 @@ export default class Joystick extends cc.Component {
     onLoad () {
         // get joyStickBtn
         this.joyStickBtn = this.node.children[0]; 
-        this.dir = cc.v2(0, 0);
     
         // touch event
         this.node.on('touchstart', this.onTouchStart, this);
@@ -65,8 +64,8 @@ export default class Joystick extends cc.Component {
         // constantly change joyStickBtn's position
         let posDelta = event.getDelta();
         this.joyStickBtn.setPosition(this.joyStickBtn.position.add(posDelta));
-        this.dir = this.joyStickBtn.position.normalize();
-        this.player.getComponent('Head').dir = this.dir;
+        let dir = this.joyStickBtn.position.normalize();
+        this.player.getComponent('Head').dir = dir;
     },
      
     onTouchEnd(event) {
